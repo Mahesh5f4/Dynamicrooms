@@ -303,9 +303,21 @@ const Floorpage = () => {
           ) : (
             <p className="text-center mt-4">No rooms found.</p>
           )}
+
+
         </>
+
+
       )}
+
+<footer className="footer">
+<div className="footer-content">
+  <p>&copy; {new Date().getFullYear()} . All rights reserved. </p>
+  <p>Aditya Institute Of Technology And Management.</p>
+</div>
+</footer>
     </Container>
+    
   );
 };
 

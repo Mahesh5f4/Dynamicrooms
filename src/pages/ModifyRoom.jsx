@@ -16,7 +16,7 @@ const ModifyRoom = () => {
   const { state } = useLocation();
   const [floor, setFloorId] = useState(state.floor);
   const [Block, setBlockId] = useState(state.Block);
-  const [Room, setRoom] = useState(state.Room);
+  const [Room, setRoom] = useState(state.Room) ;
 
   useEffect(() => {
     setRoomId(Room.room_id);

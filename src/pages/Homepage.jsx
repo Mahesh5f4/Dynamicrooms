@@ -350,6 +350,13 @@ const Homepage = () => {
         )}
   </div>
 </div>
+
+<footer className="footer">
+  <div className="footer-content">
+    <p>&copy; {new Date().getFullYear()} . All rights reserved. </p>
+    <p>Aditya Institute Of Technology And Management.</p>
+  </div>
+</footer>
     </>
   )
 
@@ -359,155 +366,4 @@ export default Homepage;
 
 
 
-// import React, { useEffect, useState } from "react";
-// import axios from "axios";
-// import { useNavigate } from "react-router-dom";
-// import { jwtDecode } from "jwt-decode";
-// import { 
-//   Button, 
-//   TextField, 
-//   Card, 
-//   CardContent, 
-//   Typography, 
-//   Container, 
-//   Grid, 
-//   Box 
-// } from "@mui/material";
-// import DeleteIcon from "@mui/icons-material/Delete";
-// import EditIcon from "@mui/icons-material/Edit";
-// import "./Homepage.css"; 
-
-// const Homepage = () => {
-//   const [block, setBlock] = useState([]);
-//   const [err, setErr] = useState("");
-//   const [loading, setLoading] = useState(true);
-//   const [searchTerm, setSearchTerm] = useState("");
-//   const navigate = useNavigate();
-//   const [access, setAccess] = useState("");
-
-//   useEffect(() => {
-//     const token = sessionStorage.getItem("token");
-//     if (token) {
-//       const decode = jwtDecode(token);
-//       setAccess(decode.role);
-//     }
-
-//     const fetchDetails = async () => {
-//       try {
-//         const details = await axios.get("http://localhost:5000/block/get-data");
-//         setBlock(details.data);
-//       } catch (err) {
-//         setErr(err.message);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-//     fetchDetails();
-//   }, []);
-
-//   if (loading) return <div className="loading">Loading...</div>;
-//   if (err) return <div className="error">Error: {err}</div>;
-
-//   const handleDelete = async (blockName) => {
-//     const confirmDelete = window.confirm(`Are you sure you want to delete ${blockName}?`);
-//     if (!confirmDelete) return;
-
-//     try {
-//       await axios.delete(`http://localhost:5000/block/delete/${blockName}`);
-//       setBlock(block.filter(b => b.block_name !== blockName));
-//       alert(`${blockName} deleted successfully!`);
-//     } catch (error) {
-//       alert("Error deleting block: " + error.message);
-//     }
-//   };
-
-//   const handleSearch = (event) => {
-//     setSearchTerm(event.target.value.toLowerCase());
-//   };
-
-//   const filteredBlocks = block.filter(b => 
-//     b.block_name.toLowerCase().includes(searchTerm)
-//   );
-
-//   return (
-//     <Container maxWidth="lg" className="homepage-container">
-//       <Box className="header-actions">
-//         {access === "super_admin" && (
-//           <Button variant="contained" color="primary" onClick={() => navigate("/add-block")}>
-//             Add Block
-//           </Button>
-//         )}
-//         <TextField 
-//           variant="outlined"
-//           label="Search Rooms"
-//           onChange={handleSearch}
-//           className="search-bar"
-//         />
-//         <Button 
-//           variant="contained"
-//           color="error"
-//           onClick={() => {
-//             sessionStorage.clear();
-//             navigate("/login");
-//           }}
-//         >
-//           Sign Out
-//         </Button>
-//         <Button variant="contained" color="success" onClick={() => navigate("/dashboard")}>
-//           Dashboard
-//         </Button>
-//       </Box>
-
-//       <Typography variant="h3" className="page-title">Home Page</Typography>
-
-//       <Grid 
-//         container 
-//         spacing={3} 
-//         justifyContent="center" 
-//         className={`card-container ${searchTerm ? "search-active" : ""}`}
-//       >
-//         {filteredBlocks.length > 0 ? (
-//           filteredBlocks.map((e, index) => (
-//             <Grid 
-//               item 
-//               xs={12} sm={6} md={4} 
-//               key={index} 
-//               className="block-card highlighted"
-//             >
-//               <Card>
-//                 <CardContent onClick={() => navigate(`/get-data/${e.block_name}`, { state: { block: e } })}>
-//                   <Typography variant="h5">{e.block_name.toUpperCase()}</Typography>
-//                   <Typography>No of Floors: {e.floors.length}</Typography>
-//                 </CardContent>
-//                 {(access === "super_admin" || access === "admin") && (
-//                   <Box className="card-actions">
-//                     <Button 
-//                       variant="contained" 
-//                       color="warning" 
-//                       startIcon={<EditIcon />} 
-//                       onClick={() => navigate(`/modify-block/${e.block_name}`)}
-//                     >
-//                       Modify
-//                     </Button>
-//                     <Button 
-//                       variant="contained" 
-//                       color="error" 
-//                       startIcon={<DeleteIcon />} 
-//                       onClick={() => handleDelete(e.block_name)}
-//                     >
-//                       Delete
-//                     </Button>
-//                   </Box>
-//                 )}
-//               </Card>
-//             </Grid>
-//           ))
-//         ) : (
-//           <Typography variant="h6" className="no-results">No results found</Typography>
-//         )}
-//       </Grid>
-//     </Container>
-//   );
-// };
-
-// export default Homepage;
+  
