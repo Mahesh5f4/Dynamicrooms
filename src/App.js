@@ -5,7 +5,7 @@ import Homepage from "./pages/Homepage";
 import Blockform from "./pages/Blockform";
 import Floorpage from "./pages/Floorpage";
 import Roomform from "./pages/Roomform";
-import UpdateRoom from "./pages/modifyRoom.jsx";
+import UpdateRoom from "./pages/ModifyRoom.jsx";
 import Login from "./pages/loginform";
 import ProtectedRoute from "./pages/ProtectedRoute";
 import Register from "./pages/Register";
