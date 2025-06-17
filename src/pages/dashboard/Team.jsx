@@ -15,7 +15,7 @@ const teamData = [
     name: 'Mahesh',
     branch: 'CSE',
     roll: '22A51A05F4',
-    email: 'mahesh20104@gmail.com.com',
+    email: 'mahesh20104@gmail.com',
     img: process.env.PUBLIC_URL + '/blazzerpic1.jpg',
     portfolio: 'https://mahesh5f4.github.io/myportfolio/',
   },
