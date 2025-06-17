@@ -68,7 +68,7 @@ input {
   left: 0;
   width: 100%;
   height: 100%;
-  background-image: url("C:\Users\madhu\Desktop\DRM\Dynamic-rooms\frontend\public\AITAM.jpeg"); /* 🔁 Replace with your actual image path */
+  background-image: url("/public/AITAM.jpeg"); /* 🔁 Replace with your actual image path */
   background-size: cover;
   background-position: center;
   filter: blur(5px);
