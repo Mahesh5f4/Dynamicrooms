@@ -41,7 +41,7 @@ const Roomform = () => {
       setRoomOccupied(false);
 
       alert("Room successfully added.");
-      navigate(`/get-data/${Block.block_name}`, { state: { block: Block } });
+      navigate(`/aitam/${Block.block_name}`, { state: { block: Block } });
     } catch (error) {
       setErr("Failed to add room");
       console.error(error);
@@ -53,7 +53,7 @@ const Roomform = () => {
   };
 
   const backhandler = () => {
-    navigate(`/get-data/${Block.block_name}`, {
+    navigate(`/aitam/${Block.block_name}`, {
       state: { block: Block, from: "modify-room" }, 
       replace: true,
     });

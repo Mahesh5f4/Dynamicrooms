@@ -1,10 +1,12 @@
-import React, { useEffect, useState,useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./Homepage.css";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
+import { toast, ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
-const Homepage = () => {
+const Homepage = ({footerHeight}) => {
   const [block, setBlock] = useState([]);
   const [err, setErr] = useState("");
   const [loading, setLoading] = useState(true);
@@ -12,36 +14,30 @@ const Homepage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   
-  const [access,setaccess] = useState("");
-  const [dept,setdept] = useState("");
-  const [isrefresh,setisrefresh] = useState(false)
+  const [access, setAccess] = useState("");
+  const [dept, setDept] = useState("");
+  const [isRefresh, setIsRefresh] = useState(false);
 
   const [showMenu, setShowMenu] = useState(false);
   const menuRef = useRef(null);
 
-  //shortcut keys..
-  useEffect(()=>{
-    const shortcutKeys = (e)=>{
-      if( e.altKey && (e.key=="s" || e.key=="S")){
-        e.preventDefault()
-        navigate("/login")
+  useEffect(() => {
+    const shortcutKeys = (e) => {
+      if (e.altKey && (e.key === "s" || e.key === "S")) {
+        e.preventDefault();
+        navigate("/login");
       }
-      if(e.ctrlKey && e.key=="r"){
-        e.preventDefault()
-        navigate("/register")
+      if (e.ctrlKey && e.key === "r") {
+        e.preventDefault();
+        navigate("/register");
       }
-    }
+    };
 
-    window.addEventListener("keydown",shortcutKeys);
-    return(()=>{
-      window.removeEventListener("keydown",shortcutKeys)
-    })
-  },[])
-
-  //when entering into another block, floor details should be removed from the session....
-  useEffect(()=>{
-    sessionStorage.removeItem("floorid")
-  },[])
+    window.addEventListener("keydown", shortcutKeys);
+    return () => {
+      window.removeEventListener("keydown", shortcutKeys);
+    };
+  }, []);
 
   useEffect(() => {
     const handleBackButton = (event) => {
@@ -49,12 +45,11 @@ const Homepage = () => {
       navigate("/"); 
     };
 
-    const token=sessionStorage.getItem("token");
-    const decode=jwtDecode(token);
-      // console.log(decode.role == "student")
-      setaccess(decode.role);
-      setdept(decode.dept);
-     
+    const token = sessionStorage.getItem("token");
+    const decode = jwtDecode(token);
+    setAccess(decode.role);
+    setDept(decode.dept);
+    
     const fetchDetails = async () => {
       try {
         const details = await axios.get("https://dr-backend-32ec.onrender.com/block/get-data");
@@ -62,9 +57,7 @@ const Homepage = () => {
         const allRooms = details.data.flatMap(block => 
           block.floors.flatMap(floor => floor.rooms)
         );
-        
         setFilteredRooms(allRooms);
-        
       } catch (err) {
         setErr(err.message);
       } finally {
@@ -74,29 +67,25 @@ const Homepage = () => {
     fetchDetails();
 
     window.history.pushState(null, null, window.location.href);
-  window.addEventListener("popstate", handleBackButton);
+    window.addEventListener("popstate", handleBackButton);
 
-  return () => {
-    window.removeEventListener("popstate", handleBackButton);
-  };
-  }, [isrefresh]);
-
+    return () => {
+      window.removeEventListener("popstate", handleBackButton);
+    };
+  }, [isRefresh]);
 
   useEffect(() => {
-  const handleClickOutside = (event) => {
-    // console.log("Clicked element:", event.target);  // Debugging
-    if (menuRef.current && !menuRef.current.contains(event.target)) {
-      // console.log("Closing menu...");  // Check if this prints
-      setShowMenu(false);
-    }
-  };
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setShowMenu(false);
+      }
+    };
 
-  document.addEventListener("mousedown", handleClickOutside);
-  return () => {
-    document.removeEventListener("mousedown", handleClickOutside);
-  };
-}, []);
-
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   if (loading) {
     return (
@@ -110,21 +99,24 @@ const Homepage = () => {
     return <div className="error">Error occurred: {err}</div>;
   }
 
-  const modifyBlock = async(e)=>{
-    try{
+  const modifyBlock = async (e) => {
+    try {
       const block_name = prompt("Enter new block name");
-    const response = await axios.put(`https://dr-backend-32ec.onrender.com//update-data/${e._id}`,{
-      "new_block":block_name
-    })
-    alert(`Block modified succesfully to ${block_name}`)
-    setisrefresh(!isrefresh);
-    }catch(err){
-      console.log(err.message)
-      alert(err.message)
+      if (!block_name) {
+        toast.warn("Block name cannot be empty!");
+        return;
+      }
+      await axios.put(`https://dr-backend-32ec.onrender.com/block/update-data/${e._id}`, {
+        "new_block": block_name
+      });
+      toast.success(`Block modified successfully to ${block_name}`);
+      setIsRefresh(!isRefresh);
+    } catch (err) {
+      console.log(err.message);
+      toast.error(`Error: ${err.message}`);
     }
-  }
+  };
 
-  
   const handleSearch = (event) => {
     const term = event.target.value.toLowerCase();
     setSearchTerm(term);
@@ -137,9 +129,9 @@ const Homepage = () => {
         }))
       )
     );
-  
+
     if (term === "") {
-      setFilteredRooms(allRooms); // Reset to all rooms when input is empty
+      setFilteredRooms(allRooms);
     } else {
       setFilteredRooms(allRooms.filter(room =>
         room.room_name.toLowerCase().includes(term) ||
@@ -150,220 +142,186 @@ const Homepage = () => {
 
   const deleteBlock = async (e) => {
     try {
-      const isConfirmed = window.confirm(`Are you sure you want to delete ${e.block_name}?`);
-      
-      if (!isConfirmed) {
-        return; 
+      if (window.confirm(`Are you sure you want to delete ${e.block_name}?`)) {
+        await axios.delete(`https://dr-backend-32ec.onrender.com/block/delete-data/${e._id}`);
+        toast.success(`${e.block_name} has been deleted successfully`);
+        
+        const details = await axios.get("https://dr-backend-32ec.onrender.com/block/get-data");
+        setBlock(details.data);
       }
-      
-      const response = await axios.delete(`https://dr-backend-32ec.onrender.com/block/delete-data/${e._id}`);
-      alert(`${e.block_name} has been deleted successfully`);
-      
-      const details = await axios.get("https://dr-backend-32ec.onrender.com/block/get-data");
-      setBlock(details.data);
     } catch (err) {
-      alert("Something went wrong while deleting the block.");
+      console.error(err);
+      toast.error("Something went wrong while deleting the block.");
     }
   };
-  
+
   const handleSignOut = () => {
-    sessionStorage.clear(); 
-    navigate("/login"); 
+    sessionStorage.clear();
+    toast.success("Signed out successfully!");
+    navigate("/login");
   };
-  
-  const handleRegisterUser=()=>{
+
+  const handleRegisterUser = () => {
     navigate("/register");
-  }
-  
-  const dashboardHandler=()=>{
+  };
+
+  const dashboardHandler = () => {
     navigate("/dashboard");
-  }
+  };
 
-  const roomsOverview=()=>{
-    navigate("/roomsOverview")
-  }
+  const roomsOverview = () => {
+    navigate("/roomsOverview");
+  };
 
-  return(
+  return (
     <>
-      <div className="container mt-3">
-  <nav className="navbar navbar-light bg-light px-3 d-flex align-items-center mb-3 position-relative" style={{ zIndex: 20 }}>
-    {/* Hamburger Menu */}
-    <div className="position-relative" ref={menuRef}>
-      <button
-        className="btn btn-outline-primary"
-        onClick={() => setShowMenu(!showMenu)}
-      >
-        ☰
-      </button>
-
-      {/* Dropdown Menu */}
-      {showMenu && (
-        <ul className="dropdown-menu show position-absolute start-0 mt-2">
-          {access == "super_admin" && (
-            <li>
-              <button className="dropdown-item text-primary" onClick={() => navigate("/add-block")}>
-                Add Block
-              </button>
-            </li>
-          )}
-          {access != "student" && (
-            <li>
-              <button className="dropdown-item text-success" onClick={handleRegisterUser}>
-                Register
-              </button>
-            </li>
-          )}
-          {access == "super_admin" && (
-            <li>
-              <button className="dropdown-item text-primary" onClick={dashboardHandler}>
-                Dashboard
-              </button>
-            </li>
-          )}
-          <li>
-            <button className="dropdown-item text-warning" onClick={roomsOverview}>
-              Rooms Overview
-            </button>
-          </li>
-
-          <li>
-            <button className="dropdown-item text-danger" onClick={handleSignOut}>
-              Sign Out
-            </button>
-          </li>
-        </ul>
-      )}
-    </div>
-
-    {/* Title in the center */}
-    <h3 className="m-0 flex-grow-1 text-center">Dynamic Rooms</h3>
-
-    {/* Search Bar */}
-    <div className="d-flex align-items-center">
-      <input
-        type="search"
-        className="form-control me-2"
-        placeholder="Search..."
-        onChange={(e) => handleSearch(e)}
-      />
-    </div>
-  </nav>
-
-  {/* Main Content */}
-  <div>
-    {/* Room Details Section (Shown when Searching) */}
-    {/* {searchTerm !== "" && (
-      <div className="room-overlay position-absolute w-100 h-100 d-flex flex-wrap justify-content-center align-items-start overflow-auto p-3"style={{ backgroundColor: "rgba(255, 255, 255, 0.95)", top: 0, left: 0, zIndex: 10 }}>
-        {filteredRooms.length ? (
-          filteredRooms.map((room, index) => (
-            <div className="room-card card p-2 shadow-sm m-2 d-flex flex-column align-items-center" key={index} style={{ width: "250px" }}>
-              <h5 className="text-primary">{room.block_name.toUpperCase()}</h5>
-              <h6>{room.room_name.toUpperCase()}</h6>
-              <p className="small">Type: {room.room_type}</p>
-              <p className="small">Capacity: {room.room_capacity}</p>
-              <p className={room.occupied ? "text-danger fw-bold" : "text-success fw-bold"}>
-                {room.occupied ? "Occupied" : "Available"}
-              </p>
-            </div>
-          ))
-        ) : (
-          <h3 className="text-center text-muted">NO Matching Rooms...</h3>
-        )}
-      </div>
-    )} */}
-
-    {searchTerm !== "" && (
-      <div
-      className="room-overlay"
-      style={{
-        position: "fixed",
-        top: "80px", // leave space for navbar
+      {/* Header/Navbar - Fixed */}
+      <div style={{
+        backgroundColor: '#1a237e',
+        padding: '10px 0',
+        position: 'fixed',
+        top: 0,
         left: 0,
-        width: "100vw",
-        height: "calc(100vh - 80px)", // adjust height accordingly
-        backgroundColor: "rgba(255, 255, 255, 0.95)",
-        zIndex: 9999,
-        overflowY: "auto",
-        padding: "20px",
-        display: "flex",
-        flexWrap: "wrap",
-        justifyContent: "center",
-        alignItems: "flex-start",
-      }}
-    >
-    
-      {filteredRooms.length ? (
-          filteredRooms.map((room, index) => (
-            <div className="room-card card p-2 shadow-sm m-2 d-flex flex-column align-items-center" key={index} style={{ width: "250px" }}>
-              <h5 className="text-primary">{room.block_name.toUpperCase()}</h5>
-              <h6>{room.room_name.toUpperCase()}</h6>
-              <p className="small">Type: {room.room_type}</p>
-              <p className="small">Capacity: {room.room_capacity}</p>
-              <p className={room.occupied ? "text-danger fw-bold" : "text-success fw-bold"}>
-                {room.occupied ? "Occupied" : "Available"}
-              </p>
+        width: '100%',
+        zIndex: 1000
+      }}>
+        <div className="container-fluid d-flex align-items-center justify-content-between flex-wrap">
+          <div style={{
+            display: 'flex',
+            width: '100%',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            flexWrap: 'wrap'
+          }}>
+            {/* Left: Logo */}
+            <div style={{ flex: '0 1 auto' }}>
+              <img
+                src="logo2.jpg"
+                alt="Logo"
+                style={{
+                  height: '60px',
+                  width: 'auto',
+                  marginLeft: '10px',
+                  borderRadius: '10px'
+                }}
+              />
             </div>
-          ))
-        ) : (
-          <h3 className="text-center text-muted">NO Matching Rooms...</h3>
-        )}
+
+            {/* Center: Title */}
+            <h3 className="m-0 text-center text-white flex-grow-1" style={{ fontSize: 'clamp(1.2rem, 2vw, 2rem)' }}>
+              Dynamic Rooms
+            </h3>
+
+            {/* Right: Search Bar */}
+            <div className="d-flex align-items-center my-2 my-md-0" style={{ flex: '0 1 auto', marginRight: '1cm', width: '100%', maxWidth: '250px' }}>
+              <input
+                type="search"
+                className="form-control me-2"
+                placeholder="Search..."
+                onChange={(e) => handleSearch(e)}
+                style={{ backgroundColor: '#eee', width: '100%' }}
+              />
+            </div>
+
+            {/* Hamburger Menu */}
+            <div className="position-relative" ref={menuRef}>
+              <button className="btn btn-outline-light" onClick={() => setShowMenu(!showMenu)}>
+                ☰
+              </button>
+              {showMenu && (
+                <ul className="dropdown-menu show position-absolute end-0 mt-2">
+                  {access === 'super_admin' && (
+                    <li><button className="dropdown-item text-primary" onClick={() => navigate('/aitam')}>Add Block</button></li>
+                  )}
+                  {access !== 'student' && (
+                    <li><button className="dropdown-item text-success" onClick={handleRegisterUser}>Register</button></li>
+                  )}
+                  {access === 'super_admin' && (
+                    <li><button className="dropdown-item text-primary" onClick={dashboardHandler}>Dashboard</button></li>
+                  )}
+                  <li><button className="dropdown-item text-warning" onClick={roomsOverview}>Rooms Overview</button></li>
+                  <li><button className="dropdown-item text-danger" onClick={handleSignOut}>Sign Out</button></li>
+                </ul>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
-    )}
 
-
-{!block.length ? (
-          <h1 className="text-center text-muted mt-4">No data found...</h1>
-        ) : (
-          <div className={`row g-2 ${searchTerm !== "" ? "blur-content" : ""}`}>
-            {block.map((e, index) => (
-              <div key={index} className="col-md-3">
-                <div className="card shadow-sm border-0 p-2">
-                  <div
-                    className="card-content text-center"
-                    onClick={() => navigate(`/get-data/${e.block_name}`, { state: { block: e } })}
-                    style={{ cursor: "pointer" }}
-                  >
-                    <div className="img bg-light mb-1 rounded" style={{ height: "80px" }}></div>
-                    <h5 className="text-primary">{e.block_name.toUpperCase()}</h5>
-                    <p className="small text-muted">No of Floors: {e.floors.length}</p>
-                  </div>
-
-                  {
-                    (access === "super_admin" || e.block_name.toLowerCase() == dept) && (
-                      <div
-                    className={`d-flex justify-content-between card-button
-                    `}>
-                      <button className="btn btn-primary btn-sm" onClick={() => modifyBlock(e)}>
-                        Modify
-                      </button>
-                      <button className="btn btn-danger btn-sm" onClick={() => deleteBlock(e)}>
-                        Delete
-                      </button>
-                  </div>
-                    )
-                  }
-                  
+      {/* Push Content Down */}
+      <div style={{ marginTop: '130px' }}>
+        {/* Search Results */}
+        {searchTerm !== '' && (
+          <div className="room-overlay" style={{
+            position: 'fixed',
+            top: '130px',
+            left: 0,
+            width: '100vw',
+            height: 'calc(100vh - 130px)',
+            backgroundColor: 'rgba(255, 255, 255, 0.95)',
+            zIndex: 999,
+            overflowY: 'auto',
+            padding: '20px',
+            paddingBottom:`${footerHeight}px`,
+            display: 'flex',
+            flexWrap: 'wrap',
+            justifyContent: 'center',
+            alignItems: 'flex-start'
+          }}>
+            {filteredRooms.length ? (
+              filteredRooms.map((room, index) => (
+                <div className="room-card card p-2 shadow-sm m-2 d-flex flex-column align-items-center"
+                  key={index}
+                  style={{ width: '100%', maxWidth: '220px', flex: '1 1 auto' }}>
+                  <h5 className="text-primary">{room.block_name.toUpperCase()}</h5>
+                  <h6>{room.room_name.toUpperCase()}</h6>
+                  <p className="small">Type: {room.room_type}</p>
+                  <p className="small">Capacity: {room.room_capacity}</p>
+                  <p className={room.occupied ? 'text-danger fw-bold' : 'text-success fw-bold'}>
+                    {room.occupied ? 'Occupied' : 'Available'}
+                  </p>
                 </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <h3 className="text-center text-muted">NO Matching Rooms...</h3>
+            )}
           </div>
         )}
-  </div>
-</div>
+      </div>
 
-<footer className="footer">
-  <div className="footer-content">
-    <p>&copy; {new Date().getFullYear()} . All rights reserved. </p>
-    <p>Aditya Institute Of Technology And Management.</p>
-  </div>
-</footer>
+      {/* Main Block List */}
+      {!block.length ? (
+        <h1 className="text-center text-muted mt-4">No data found...</h1>
+      ) : (
+        <div className={`row g-2 ${searchTerm !== '' ? 'blur-content' : ''}`}>
+          {block.map((e, index) => (
+            <div key={index} className="col-12 col-md-6 col-lg-3">
+              <div
+  className="card shadow-sm p-2"
+  style={{ border: "1px solid #003366" }} // Dark blue border
+>
+                <div
+                  className="card-content text-center"
+                  onClick={() => navigate(`/aitam/${e.block_name}`)}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <div className="img bg-light mb-1 rounded" style={{ height: '80px' }}></div>
+                  <h5 className="text-primary">{e.block_name.toUpperCase()}</h5>
+                  <p className="small text-muted">No of Floors: {e.floors.length}</p>
+                </div>
+
+                {(access === 'super_admin' || e.block_name.toLowerCase() === dept) && (
+                  <div className="d-flex justify-content-between card-button">
+                    <button className="btn btn-primary btn-sm" onClick={() => modifyBlock(e)}>Modify</button>
+                    <button className="btn btn-danger btn-sm" onClick={() => deleteBlock(e)}>Delete</button>
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </>
-  )
-
+  );
 }
 export default Homepage;
-
-
-
-
-  

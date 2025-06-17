@@ -16,7 +16,7 @@ const ModifyRoom = () => {
   const { state } = useLocation();
   const [floor, setFloorId] = useState(state.floor);
   const [Block, setBlockId] = useState(state.Block);
-  const [Room, setRoom] = useState(state.Room) ;
+  const [Room, setRoom] = useState(state.Room);
 
   useEffect(() => {
     setRoomId(Room.room_id);
@@ -41,7 +41,7 @@ const ModifyRoom = () => {
       );
 
       alert("Room modified successfully.");
-      navigate(`/get-data/${Block.block_name}`, {
+      navigate(`/aitam/${Block.block_name}`, {
          state: { block: Block, },
 
          });
@@ -51,7 +51,7 @@ const ModifyRoom = () => {
     }
   };
   const backhandler = () => {
-    navigate(`/get-data/${Block.block_name}`, {
+    navigate(`/aitam/${Block.block_name}`, {
       state: { block: Block, from: "modify-room" }, 
       replace: true,
     });
