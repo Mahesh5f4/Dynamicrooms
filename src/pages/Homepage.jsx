@@ -310,12 +310,14 @@ const Homepage = ({footerHeight}) => {
                   <p className="small text-muted">No of Floors: {e.floors.length}</p>
                 </div>
 
-                {(access === 'super_admin' || e.block_name.toLowerCase() === dept) && (
-                  <div className="d-flex justify-content-between card-button">
-                    <button className="btn btn-primary btn-sm" onClick={() => modifyBlock(e)}>Modify</button>
-                    <button className="btn btn-danger btn-sm" onClick={() => deleteBlock(e)}>Delete</button>
-                  </div>
+                {
+                (access === 'super_admin' || e.block_name.trim().toLowerCase() === dept.trim().toLowerCase()) && (
+                <div className="d-flex justify-content-between card-button">
+                <button className="btn btn-primary btn-sm" onClick={() => modifyBlock(e)}>Modify</button>
+                <button className="btn btn-danger btn-sm" onClick={() => deleteBlock(e)}>Delete</button>
+                </div>
                 )}
+
               </div>
             </div>
           ))}
