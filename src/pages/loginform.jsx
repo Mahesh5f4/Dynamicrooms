@@ -39,11 +39,17 @@ const Login = ({ setIsAuthenticated }) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const payload = isAdmin ? { userId, password } : { userId };
+      const trimmedUserId = userId.trim();
+      const trimmedPassword = password.trim();
+
+      const payload = isAdmin 
+        ? { userId: trimmedUserId, password: trimmedPassword } 
+        : { userId: trimmedUserId };
+
       const res = await axios.post("https://dr-backend-32ec.onrender.com/auth/login", payload);
 
       if (isAdmin && res) {
-        await axios.get(`https://dr-backend-32ec.onrender.com/auth/userDetails/${userId}`);
+        await axios.get(`https://dr-backend-32ec.onrender.com/auth/userDetails/${trimmedUserId}`);
       }
 
       sessionStorage.setItem("token", JSON.stringify(res.data.token));

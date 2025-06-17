@@ -21,8 +21,18 @@ const Loader = ({ text = "Loading...", centered = true }) => {
 const Floorpage = () => {
   const navigate = useNavigate();
   const { blockname } = useParams();
+  const [block, setBlock] = useState(() => {
+  try {
+    const savedBlock = localStorage.getItem("block");
+    return savedBlock ? JSON.parse(savedBlock) : null;
+  } catch (err) {
+    console.error("Invalid JSON in localStorage for 'block':", err);
+    localStorage.removeItem("block"); // Optional: clear corrupted value
+    return null;
+  }
+});
 
-  const [block, setBlock] = useState(() => JSON.parse(localStorage.getItem("block")) || null);
+  // const [block, setBlock] = useState(() => JSON.parse(localStorage.getItem("block")) || null);
   const [floorid, setFloorid] = useState(null);
   const [floorName, setFloorName] = useState("");
   const [roomdata, setRoomData] = useState([]);
@@ -114,8 +124,30 @@ const Floorpage = () => {
     }
   };
 
+
   updateOccupancy();
   },[timetables])
+
+
+useEffect(() => {
+  const savedFloor = sessionStorage.getItem("selectedFloor");
+
+  if (savedFloor) {
+    try {
+      const parsedFloor = JSON.parse(savedFloor);
+      setFloorid(parsedFloor);
+      setRoomData(parsedFloor.rooms);
+    } catch (error) {
+      console.error("Invalid JSON in sessionStorage for 'selectedFloor'", error);
+      sessionStorage.removeItem("selectedFloor"); 
+      setFloorid(null); 
+      setRoomData([]);
+    }
+  }
+}, []);
+
+
+
 
  const getRoomsWithTimetable = async () => {
   const res = await fetch('https://dr-backend-32ec.onrender.com/periods/available-timetables');
@@ -299,6 +331,7 @@ const getCurrentPeriod = (timetable, testHour = null, testMin = null) => {
 
   const confirmDeleteFloor = () => {
     setDialogType("floor");
+    sessionStorage.removeItem("selectedFloor")
     setShowDialog(true);
   };
 
@@ -333,14 +366,18 @@ const getCurrentPeriod = (timetable, testHour = null, testMin = null) => {
   };
 
   const displayRoom = (floor) => {
+    sessionStorage.setItem("selectedFloor", JSON.stringify(floor));
     setRoomData(floor.rooms);
     setFloorid(floor);
+    
   };
 
   const backToFloors = () => {
+    sessionStorage.removeItem("selectedFloor");
     setFloorid(null);
     setRoomData([]);
     setRoomSearch("");
+
   };
 
   const addRooms = () => {
@@ -357,7 +394,10 @@ const getCurrentPeriod = (timetable, testHour = null, testMin = null) => {
     });
   };
 
-  const backtohome = () => navigate(`/`);
+  const backtohome = () => {
+    navigate(`/`)
+    sessionStorage.removeItem("selectedFloor")
+  };
 
   const canEdit = (access === "super_admin") || (access !== "student" && dept.toLowerCase() === block?.block_name?.toLowerCase());
 
@@ -388,7 +428,7 @@ const getCurrentPeriod = (timetable, testHour = null, testMin = null) => {
 
       <Row className="justify-content-end mb-3">
         <Col xs="auto">
-          <Button variant="danger" onClick={backtohome} size="lg">Back</Button>
+          <Button variant="danger" onClick={backtohome} size="lg">Back to Home</Button>
         </Col>
       </Row>
 
@@ -469,14 +509,6 @@ const getCurrentPeriod = (timetable, testHour = null, testMin = null) => {
                       <option value="empty">Empty</option>
                     </Form.Select>
                   </Col>
-                  {/* <Col xs="auto">
-                    <Form.Select value={filterRoomType} onChange={(e) => setFilterRoomType(e.target.value)} size="lg">
-                      <option value="all">All</option>
-                      <option value="classroom">Classroom</option>
-                      <option value="lab">Lab</option>
-                      <option value="seminarhall">Seminar Hall</option>
-                    </Form.Select>
-                  </Col> */}
                 </Row>
 
                 

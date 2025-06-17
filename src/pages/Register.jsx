@@ -44,7 +44,7 @@ const Register = () => {
         const token = localStorage.getItem("token");
         setLoading(true)
         try {
-            const response = await fetch("http://localhost:5000/auth/register", {
+            const response = await fetch("https://dr-backend-32ec.onrender.com/auth/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
