@@ -1,126 +1,70 @@
-import React, { useEffect, useRef } from 'react';
+import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { FaEnvelope, FaIdBadge } from 'react-icons/fa';
 
 const teamData = [
-  {
-    name: 'Madhu',
-    branch: 'CSE',
-    roll: '22A51A05F5',
-    email: 'madhukorada23@gmail.com',
-    img: process.env.PUBLIC_URL + '/madhu.jpg',
-    portfolio: 'https://madhu-portfolio-m9yv.onrender.com/',
-  },
-  {
-    name: 'Mahesh',
-    branch: 'CSE',
-    roll: '22A51A05F4',
-    email: 'mahesh20104@gmail.com',
-    img: process.env.PUBLIC_URL + '/blazzerpic1.jpg',
-    portfolio: 'https://mahesh5f4.github.io/myportfolio/',
-  },
-  {
-    name: 'Jagadeesh',
-    branch: 'CSE',
-    roll: '22A51A05D9',
-    email: 'sneha.reddy@example.com',
-    img: process.env.PUBLIC_URL + '/jagga.jpg',
-    portfolio: 'https://snehareddy.me',
-  },
-  {
-    name: 'Bharath',
-    branch: 'CSE',
-    roll: '22A51A05F7',
-    email: 'bharathkurasa@gmail.com',
-    img: process.env.PUBLIC_URL + '/bharath.jpg',
-    portfolio: 'https://rahulverma.io',
-  },
+  { name: 'Madhu',   branch: 'CSE', roll: '22A51A05F5', email: 'madhukorada23@gmail.com',   img: process.env.PUBLIC_URL + '/madhu.jpg' },
+  { name: 'Mahesh',  branch: 'CSE', roll: '22A51A05F4', email: 'mahesh20104@gmail.com',     img: process.env.PUBLIC_URL + '/blazzerpic1.jpg' },
+  { name: 'Jagadeesh', branch: 'CSE', roll: '22A51A05D9', email: 'dasarijagadeesh442@gmail.com', img: process.env.PUBLIC_URL + '/jagga.jpg' },
+  { name: 'Bharath', branch: 'CSE', roll: '22A51A05F7', email: 'bharathkurasa@gmail.com',   img: process.env.PUBLIC_URL + '/bharath.jpg' },
 ];
 
-const Team = () => {
-  const scrollRef = useRef(null);
+const Team = () => (
+  <div className="container py-5">
+    <h2
+      className="text-center fw-bold mb-5 display-6"
+      style={{ color: '#2c3e50', textShadow: '0 1px 2px rgba(255,255,255,.3)' }}
+    >
+      ✨ Our Creative Team ✨
+    </h2>
 
-  useEffect(() => {
-    const scrollContainer = scrollRef.current;
-
-    let scrollAmount = 0;
-    const scrollStep = 1;
-    const scrollDelay = 10;
-
-    const autoScroll = () => {
-      if (scrollContainer && scrollAmount < scrollContainer.scrollWidth / 2) {
-        scrollAmount += scrollStep;
-        scrollContainer.scrollLeft += scrollStep;
-        setTimeout(autoScroll, scrollDelay);
-      } else {
-        scrollAmount = 0;
-        scrollContainer.scrollLeft = 0;
-        setTimeout(autoScroll, scrollDelay);
-      }
-    };
-
-    autoScroll();
-  }, []);
-
-  return (
-    <div className="container mt-5 mb-5">
-      <h2 className="text-center mb-4 fw-bold">🌟 Meet Our Team 🌟</h2>
-
-      <div
-        ref={scrollRef}
-        className="d-flex overflow-hidden px-2 py-3"
-        style={{
-          scrollBehavior: 'smooth',
-          whiteSpace: 'nowrap',
-          gap: '1rem',
-        }}
-      >
-        {teamData.map((member, index) => (
+    <div className="row justify-content-center g-4">
+      {teamData.map((m, i) => (
+        <div key={i} className="col-12 col-sm-6 col-md-4 col-lg-3 d-flex align-items-stretch">
           <div
-            key={index}
-            className="card shadow-lg border-0 rounded-4 me-3"
+            className="glass-card shadow-lg w-100 p-3 rounded-4 border"
             style={{
-              minWidth: '260px',
-              transition: 'transform 0.3s ease-in-out',
-              display: 'inline-block',
-              cursor: 'pointer',
+              backdropFilter: 'blur(10px)',
+              background: 'rgba(255,255,255,.7)',
+              border: '1px solid rgba(0,0,0,.1)',
+              transition: 'transform .3s, box-shadow .3s',
             }}
-            onMouseEnter={(e) => (e.currentTarget.style.transform = 'scale(1.03)')}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+            onMouseEnter={e => {
+              e.currentTarget.style.transform = 'scale(1.03)';
+              e.currentTarget.style.boxShadow = '0 12px 20px rgba(0,0,0,.2)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.transform = 'scale(1)';
+              e.currentTarget.style.boxShadow = '0 6px 12px rgba(0,0,0,.1)';
+            }}
           >
+            {/* Full‑width responsive image */}
             <img
-              src={member.img}
-              className="card-img-top rounded-top"
-              alt={member.name}
-              style={{ height: '200px', objectFit: 'cover' }}
+              src={m.img}
+              alt={m.name}
+              className="img-fluid w-100 rounded-4 mb-3"
+              style={{ height: '200px', objectFit: 'cover', borderBottomLeftRadius: '0', borderBottomRightRadius: '0' }}
             />
-            <div className="card-body text-center">
-              <h5 className="card-title fw-bold text-primary">{member.name}</h5>
-              <span className="badge bg-info mb-2">{member.branch}</span>
-              <p className="card-text mb-2 text-secondary">
-                <FaIdBadge className="me-1 text-dark" />
-                {member.roll}
+
+            <div className="text-center">
+              <h5 className="fw-bold text-dark mb-1">{m.name}</h5>
+              <span className="badge bg-info mb-2">{m.branch}</span>
+              <p className="text-dark mb-2">
+                <FaIdBadge className="me-1 text-secondary" />
+                {m.roll}
               </p>
-              <p className="card-text mb-2 text-secondary">
-                <FaEnvelope className="me-1 text-dark" />
-                <a href={`mailto:${member.email}`} className="text-decoration-none">
-                  {member.email}
+              <p className="text-dark mb-0">
+                <FaEnvelope className="me-1 text-secondary" />
+                <a href={`mailto:${m.email}`} className="text-dark text-decoration-none">
+                  {m.email}
                 </a>
               </p>
-              <a
-                href={member.portfolio}
-                className="btn btn-outline-primary btn-sm mt-2"
-                target="_blank"
-                rel="noreferrer"
-              >
-                🔗 View Portfolio
-              </a>
             </div>
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
     </div>
-  );
-};
+  </div>
+);
 
 export default Team;
