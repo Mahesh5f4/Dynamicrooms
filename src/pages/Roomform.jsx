@@ -25,7 +25,7 @@ const Roomform = () => {
     e.preventDefault();
     try {
       await axios.post(
-        `https://dr-backend-32ec.onrender.com/block/floors/room/${Block._id}/${floor._id}`,
+        `http://localhost:5000/api/block/floors/room/${Block._id}/${floor._id}`,
         {
           room_id: roomId,
           room_name: roomName,

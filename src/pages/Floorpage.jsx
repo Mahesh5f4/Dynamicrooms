@@ -114,7 +114,7 @@ const Floorpage = () => {
   };
 
   const getRoomsWithTimetable = async () => {
-    const res = await fetch("https://dr-backend-32ec.onrender.com/periods/available-timetables");
+    const res = await fetch("http://localhost:5000/api/periods/available-timetables");
     return res.json();
   };
 
@@ -132,7 +132,7 @@ const Floorpage = () => {
           .map(async (room) => {
             const encoded = encodeURIComponent(room.room_name);
             try {
-              const res = await fetch(`https://dr-backend-32ec.onrender.com/periods/${encoded}`);
+              const res = await fetch(`http://localhost:5000/api/periods/${encoded}`);
               results[room.room_name] = res.ok ? (await res.json()).timetableData : null;
             } catch {
               results[room.room_name] = null;
@@ -168,7 +168,7 @@ const Floorpage = () => {
     const fetchBlockData = async () => {
       try {
         setLoading(true);
-        const res = await axios.get(`https://dr-backend-32ec.onrender.com/block/get-data-name/${blockname}`);
+        const res = await axios.get(`http://localhost:5000/api/block/get-data-name/${blockname}`);
         setBlock(res.data);
         localStorage.setItem("block", JSON.stringify(res.data));
       } catch (error) {
@@ -227,7 +227,7 @@ const Floorpage = () => {
         if (room.occupied !== occ) {
           try {
             await fetch(
-              `https://dr-backend-32ec.onrender.com/block/floors/room/${block._id}/${floorid._id}/${room._id}`,
+              `http://localhost:5000/api/block/floors/room/${block._id}/${floorid._id}/${room._id}`,
               {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
@@ -269,7 +269,7 @@ const Floorpage = () => {
     formData.append("className", room);
 
     try {
-      const res = await fetch("https://dr-backend-32ec.onrender.com/periods/upload", {
+      const res = await fetch("http://localhost:5000/api/periods/upload", {
         method: "POST",
         body : formData,
       });
@@ -285,7 +285,7 @@ const Floorpage = () => {
   const deleteTimetableByClass = async (cls) => {
     if (!window.confirm(`Delete timetable for ${cls}?`)) return;
     try {
-      await axios.delete(`https://dr-backend-32ec.onrender.com/periods/class/${cls}`);
+      await axios.delete(`http://localhost:5000/api/periods/class/${cls}`);
       await fetchTimetables();
       alert("Timetable deleted successfully!");
     } catch (e) {
@@ -299,11 +299,11 @@ const Floorpage = () => {
     e.preventDefault();
     if (!floorName.trim()) return alert("Please enter the floor name");
     try {
-      await axios.post(`https://dr-backend-32ec.onrender.com/block/floor/${block?._id}`, {
+      await axios.post(`http://localhost:5000/block/floor/${block?._id}`, {
         floor_name: floorName,
       });
       setFloorName("");
-      const res = await axios.get(`https://dr-backend-32ec.onrender.com/block/get-data/${block?._id}`);
+      const res = await axios.get(`http://localhost:5000/api/block/get-data/${block?._id}`);
       setBlock(res.data);
     } catch {
       alert("Failed to add floor");
@@ -328,15 +328,15 @@ const Floorpage = () => {
       if (!block || !floorid) return;
 
       if (dialogType === "floor") {
-        await axios.delete(`https://dr-backend-32ec.onrender.com/block/${block._id}/floor/${floorid._id}`);
+        await axios.delete(`http://localhost:5000/api/block/${block._id}/floor/${floorid._id}`);
         setFloorid(null);
       } else if (selectedRoom) {
         await axios.delete(
-          `https://dr-backend-32ec.onrender.com/block/${block._id}/floor/${floorid._id}/room/${selectedRoom._id}`,
+          `http://localhost:5000/block/${block._id}/floor/${floorid._id}/room/${selectedRoom._id}`,
         );
       }
 
-      const res = await axios.get(`https://dr-backend-32ec.onrender.com/block/get-data/${block._id}`);
+      const res = await axios.get(`http://localhost:5000/api/block/get-data/${block._id}`);
       localStorage.setItem("block", JSON.stringify(res.data));
       setBlock(res.data);
       setRoomData(res.data.floors.find(f => f._id === floorid?._id)?.rooms || []);

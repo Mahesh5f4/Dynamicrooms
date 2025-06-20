@@ -52,7 +52,7 @@ const Homepage = ({footerHeight}) => {
     
     const fetchDetails = async () => {
       try {
-        const details = await axios.get("https://dr-backend-32ec.onrender.com/block/get-data");
+        const details = await axios.get("http://localhost:5000/api/block/get-data");
         setBlock(details.data);
         const allRooms = details.data.flatMap(block => 
           block.floors.flatMap(floor => floor.rooms)
@@ -106,7 +106,7 @@ const Homepage = ({footerHeight}) => {
         toast.warn("Block name cannot be empty!");
         return;
       }
-      await axios.put(`https://dr-backend-32ec.onrender.com/block/update-data/${e._id}`, {
+      await axios.put(`http://localhost:5000/api/block/update-data/${e._id}`, {
         "new_block": block_name
       });
       toast.success(`Block modified successfully to ${block_name}`);
@@ -143,10 +143,10 @@ const Homepage = ({footerHeight}) => {
   const deleteBlock = async (e) => {
     try {
       if (window.confirm(`Are you sure you want to delete ${e.block_name}?`)) {
-        await axios.delete(`https://dr-backend-32ec.onrender.com/block/delete-data/${e._id}`);
+        await axios.delete(`http://localhost:5000/api/block/delete-data/${e._id}`);
         toast.success(`${e.block_name} has been deleted successfully`);
         
-        const details = await axios.get("https://dr-backend-32ec.onrender.com/block/get-data");
+        const details = await axios.get("http://localhost:5000/api/block/get-data");
         setBlock(details.data);
       }
     } catch (err) {

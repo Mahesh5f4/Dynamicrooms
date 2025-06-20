@@ -13,7 +13,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchAdmins = async () => {
       try {
-        const response = await axios.get("https://dr-backend-32ec.onrender.com/auth/details");
+        const response = await axios.get("http://localhost:5000/api/auth/details");
         setAdmins(response.data);
       } catch (err) {
         setError(err.response?.data?.message || "Error fetching admins");
@@ -29,7 +29,7 @@ const AdminDashboard = () => {
     if (!confirmDelete) return;
 
     try {
-      await axios.delete(`https://dr-backend-32ec.onrender.com/auth/delete/${adminid}`);
+      await axios.delete(`http://localhost:5000/api/auth/delete/${adminid}`);
       alert("Admin deleted successfully!");
       setAdmins(admins.filter((admin) => admin._id !== adminid));
     } catch (err) {

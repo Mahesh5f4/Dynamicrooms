@@ -12,7 +12,7 @@ const RoomsOverview = () => {
     useEffect(() => {
         const fetch = async () => {
             try {
-                const response = await axios.get("https://dr-backend-32ec.onrender.com/block/get-data");
+                const response = await axios.get("http://localhost:5000/api/block/get-data");
                 setBlock(response.data);
             } catch (e) {
                 console.log(e.message);
@@ -27,7 +27,7 @@ const RoomsOverview = () => {
 
     const getRoomDetails = async () => {
         try {
-            const response = await axios.get(`https://dr-backend-32ec.onrender.com/block/dashboard/${branch}/${status}`);
+            const response = await axios.get(`http://localhost:5000/api/block/dashboard/${branch}/${status}`);
             setRooms(response.data);
         } catch (e) {
             console.log(e.message);
